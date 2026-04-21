@@ -66,7 +66,8 @@ app.post('/register', async (req, res) => {
             createdAt: new Date()
         });
 
-        res.send('註冊成功！<a href="/">返回登入頁面</a>');
+        // 註冊成功後重定向到登入頁面
+        res.redirect('/login.html?registered=true');
     } catch (error) {
         console.error('註冊錯誤:', error);
         res.status(500).send('註冊失敗，請稍後再試');
@@ -94,11 +95,17 @@ app.post('/login', async (req, res) => {
             return res.status(400).send('用戶名或密碼錯誤');
         }
 
-        res.send(`登入成功！歡迎, ${username} <br><a href="/">登出</a>`);
+        // 登入成功後重定向到主頁，並傳遞用戶名
+        res.redirect(`/dashboard.html?username=${encodeURIComponent(username)}`);
     } catch (error) {
         console.error('登入錯誤:', error);
         res.status(500).send('登入失敗，請稍後再試');
     }
+});
+
+// 登出路由
+app.get('/logout', (req, res) => {
+    res.redirect('/');
 });
 
 // 啟動伺服器

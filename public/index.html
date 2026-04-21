@@ -3,33 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用戶註冊與登入系統</title>
+    <title>登入系統 - 首頁</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn-register {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-register:hover {
+            background-color: #45a049;
+        }
+        .btn-login {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-login:hover {
+            background-color: #1976D2;
+        }
+        .description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+    </style>
 </head>
 <body>
-    <h1>用戶註冊與登入系統</h1>
-
-    <h2>註冊新用戶</h2>
-    <form action="/register" method="POST">
-        <label for="reg-username">用戶名:</label><br>
-        <input type="text" id="reg-username" name="username" required><br><br>
+    <div class="container">
+        <h1>🔐 用戶登入系統</h1>
+        <p class="description">
+            歡迎使用我們的用戶登入系統。<br>
+            請選擇註冊新帳號或登入現有帳號以繼續。
+        </p>
         
-        <label for="reg-password">密碼:</label><br>
-        <input type="password" id="reg-password" name="password" required><br><br>
-        
-        <input type="submit" value="註冊">
-    </form>
-
-    <hr>
-
-    <h2>用戶登入</h2>
-    <form action="/login" method="POST">
-        <label for="login-username">用戶名:</label><br>
-        <input type="text" id="login-username" name="username" required><br><br>
-        
-        <label for="login-password">密碼:</label><br>
-        <input type="password" id="login-password" name="password" required><br><br>
-        
-        <input type="submit" value="登入">
-    </form>
+        <div class="btn-container">
+            <a href="/register.html" class="btn btn-register">註冊新用戶</a>
+            <a href="/login.html" class="btn btn-login">用戶登入</a>
+        </div>
+    </div>
 </body>
 </html>
