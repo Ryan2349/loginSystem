@@ -1,0 +1,20 @@
+{
+  "name": "loginsystem",
+  "version": "1.0.0",
+  "description": "用戶註冊與登入系統",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["login", "register", "nodejs", "mongodb", "express"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.2",
+    "express": "^5.2.1",
+    "mongodb": "^7.2.0"
+  }
+}
