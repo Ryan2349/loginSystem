@@ -71,6 +71,10 @@
             font-weight: bold;
             margin-bottom: 20px;
         }
+        .loading {
+            color: #2196F3;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -81,48 +85,80 @@
     <div class="container">
         <div class="welcome-card">
             <h1>登入成功！</h1>
+            <div id="loading-msg" class="loading">
+                正在驗證您的身分...
+            </div>
             <div id="error-msg" class="error-message" style="display: none;">
                 請先登入以訪問此頁面
             </div>
-            <div class="user-info">
-                <p>歡迎您，<strong id="username-display">用戶</strong></p>
-                <p>您已成功登入系統</p>
+            <div id="content-area" style="display: none;">
+                <div class="user-info">
+                    <p>歡迎您，<strong id="username-display">用戶</strong></p>
+                    <p>您已成功登入系統</p>
+                </div>
+                
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>📊 個人資訊</h3>
+                        <p>查看和編輯您的個人資料</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔒 安全設定</h3>
+                        <p>管理您的帳號安全選項</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📝 活動記錄</h3>
+                        <p>查看您的帳號活動歷史</p>
+                    </div>
+                </div>
+                
+                <a href="/logout" class="logout-btn">登出</a>
             </div>
-            
-            <div class="features">
-                <div class="feature-card">
-                    <h3>📊 個人資訊</h3>
-                    <p>查看和編輯您的個人資料</p>
-                </div>
-                <div class="feature-card">
-                    <h3>🔒 安全設定</h3>
-                    <p>管理您的帳號安全選項</p>
-                </div>
-                <div class="feature-card">
-                    <h3>📝 活動記錄</h3>
-                    <p>查看您的帳號活動歷史</p>
-                </div>
-            </div>
-            
-            <a href="/logout" class="logout-btn">登出</a>
         </div>
     </div>
 
     <script>
-        // 從 URL 參數獲取用戶名並顯示
-        const urlParams = new URLSearchParams(window.location.search);
-        const username = urlParams.get('username');
-        
-        if (username) {
-            document.getElementById('username-display').textContent = decodeURIComponent(username);
-        } else {
-            // 如果沒有用戶名參數，顯示錯誤訊息並引導回登入頁
-            document.getElementById('error-msg').style.display = 'block';
-            document.getElementById('error-msg').textContent = '請先登入以訪問此頁面';
-            setTimeout(() => {
-                window.location.href = '/login.html';
-            }, 2000);
+        // 從伺服器 API 獲取用戶資訊（而不是從 URL 參數）
+        async function checkAuthentication() {
+            try {
+                const response = await fetch('/api/user', {
+                    method: 'GET',
+                    credentials: 'same-origin' // 發送 session cookie
+                });
+                
+                const data = await response.json();
+                
+                // 隱藏載入訊息
+                document.getElementById('loading-msg').style.display = 'none';
+                
+                if (response.ok && data.isLoggedIn) {
+                    // 用戶已登入，顯示內容
+                    document.getElementById('username-display').textContent = data.username;
+                    document.getElementById('content-area').style.display = 'block';
+                } else {
+                    // 用戶未登入，顯示錯誤並重定向
+                    document.getElementById('error-msg').style.display = 'block';
+                    document.getElementById('error-msg').textContent = '請先登入以訪問此頁面';
+                    
+                    // 2 秒後重定向到登入頁
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('驗證失敗:', error);
+                document.getElementById('loading-msg').style.display = 'none';
+                document.getElementById('error-msg').style.display = 'block';
+                document.getElementById('error-msg').textContent = '驗證失敗，請重新登入';
+                
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 2000);
+            }
         }
+        
+        // 頁面載入時檢查認證狀態
+        checkAuthentication();
     </script>
 </body>
 </html>

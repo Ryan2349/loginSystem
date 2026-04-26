@@ -7,7 +7,13 @@
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["login", "register", "nodejs", "mongodb", "express"],
+  "keywords": [
+    "login",
+    "register",
+    "nodejs",
+    "mongodb",
+    "express"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
@@ -15,6 +21,7 @@
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.2",
     "express": "^5.2.1",
+    "express-session": "^1.19.0",
     "mongodb": "^7.2.0"
   }
 }

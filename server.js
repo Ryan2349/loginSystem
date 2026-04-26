@@ -3,6 +3,7 @@ const { MongoClient } = require('mongodb');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const path = require('path');
+const session = require('express-session');
 
 const app = express();
 const PORT = 3000;
@@ -10,6 +11,18 @@ const PORT = 3000;
 // 解析請求體
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// 設置 Session 中間件
+app.use(session({
+    secret: 'your-secret-key-change-in-production', // 生產環境請使用環境變數
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        secure: false, // 生產環境設為 true (使用 HTTPS 時)
+        httpOnly: true, // 防止 XSS 攻擊
+        maxAge: 30 * 60 * 1000 // 30 分鐘過期
+    }
+}));
 
 // 提供靜態文件 (HTML)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -95,17 +108,57 @@ app.post('/login', async (req, res) => {
             return res.status(400).send('用戶名或密碼錯誤');
         }
 
-        // 登入成功後重定向到主頁，並傳遞用戶名
-        res.redirect(`/dashboard.html?username=${encodeURIComponent(username)}`);
+        // 登入成功：設置 Session
+        req.session.isLoggedIn = true;
+        req.session.username = username;
+        
+        // 登入成功後重定向到主頁
+        res.redirect('/dashboard.html');
     } catch (error) {
         console.error('登入錯誤:', error);
         res.status(500).send('登入失敗，請稍後再試');
     }
 });
 
+// 保護的 Dashboard 路由 - 需要登入才能訪問
+app.get('/dashboard', (req, res) => {
+    // 檢查用戶是否已登入
+    if (!req.session.isLoggedIn || !req.session.username) {
+        return res.redirect('/login.html?error=unauthorized');
+    }
+    
+    // 如果已登入，提供 dashboard 頁面
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+// 處理直接訪問 dashboard.html 的請求
+app.get('/dashboard.html', (req, res) => {
+    // 檢查用戶是否已登入
+    if (!req.session.isLoggedIn || !req.session.username) {
+        return res.redirect('/login.html?error=unauthorized');
+    }
+    
+    // 如果已登入，提供 dashboard 頁面
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+// API 端點：獲取當前登入用戶資訊
+app.get('/api/user', (req, res) => {
+    if (!req.session.isLoggedIn || !req.session.username) {
+        return res.status(401).json({ error: '未登入' });
+    }
+    res.json({ username: req.session.username, isLoggedIn: true });
+});
+
 // 登出路由
 app.get('/logout', (req, res) => {
-    res.redirect('/');
+    // 銷毀 Session
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('登出錯誤:', err);
+        }
+        res.redirect('/');
+    });
 });
 
 // 啟動伺服器

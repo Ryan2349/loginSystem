@@ -1,100 +1,60 @@
 # 用戶註冊登入系統 (Login System)
 
-這是一個使用 Node.js、Express、MongoDB 和 HTML 構建的簡單用戶註冊與登入應用。
+這是一個使用 Node.js、Express、MongoDB 和 HTML 構建的簡單用戶註冊與登入應用，旨在演示基礎的認證流程與 Session 會話管理。
 
-## 功能特點
+## 項目特色 (Features)
 
-- 用戶註冊 (密碼會進行 bcrypt 哈希處理)
-- 用戶登入 (驗證密碼)
-- 使用 MongoDB Atlas 作為資料庫
-- 現代化 HTML/CSS 前端介面
-- 分離的頁面設計 (註冊頁、登入頁、主頁)
+- **安全認證**: 使用 `bcryptjs` 進行密碼哈希加密儲存。
+- **會話管理**: 透過 `express-session` 實現伺服器端狀態追蹤，防止未授權訪問 Dashboard。
+- **資料庫整合**: 使用 MongoDB Atlas 儲存用戶資料，並建立唯一索引確保用戶名不重複。
+- **前端介面**: 提供完整的註冊、登入及個人主頁 (Dashboard) 靜態頁面。
+- **安全性強化**: 設置 `HttpOnly` Cookie 防止 XSS 攻擊，並實作 30 分鐘會話過期機制。
 
-## 環境要求
+## 檔案結構 (Folder Structure)
 
-- Node.js (建議版本 14+)
-- npm
-- MongoDB Atlas 帳號 (或本地 MongoDB 實例)
-
-## 安裝步驟
-
-1. **安裝依賴套件**
-   ```bash
-   npm install
-   ```
-
-2. **配置 MongoDB Atlas 連接字串**
-   
-   打開 `server.js` 文件，找到以下行：
-   ```javascript
-   const MONGODB_URI = 'your_mongodb_atlas_connection_string';
-   ```
-   
-   將 `'your_mongodb_atlas_connection_string'` 替換為您的 MongoDB Atlas 連接字串。
-   
-   範例格式：
-   ```javascript
-   const MONGODB_URI = 'mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority';
-   ```
-
-3. **啟動伺服器**
-   ```bash
-   node server.js
-   ```
-
-4. **訪問應用**
-   
-   在瀏覽器中打開：`http://localhost:3000`
-
-## 專案結構
-
-```
+```text
 loginSystem/
 ├── public/
-│   ├── index.html          # 首頁 (導航頁面)
-│   ├── register.html       # 用戶註冊頁面
-│   ├── login.html          # 用戶登入頁面
-│   └── dashboard.html      # 登入後的主頁
-├── server.js               # 後端伺服器 (Express + MongoDB)
-├── package.json            # 專案配置與依賴
-├── .gitignore              # Git 忽略文件
-└── README.md               # 本文件
+│   ├── index.html          # 首頁 (導航)
+│   ├── register.html       # 註冊頁面
+│   ├── login.html          # 登入頁面
+│   └── dashboard.html      # 登入後主頁 (受保護)
+├── server.js               # 後端主程式 (Express 路由與資料庫邏輯)
+├── package.json            # 專案依賴配置
+└── README.md               # 專案說明文件
 ```
 
-## 頁面說明
+## 快速開始 (Getting Started)
 
-| 頁面 | 路徑 | 說明 |
-|------|------|------|
-| 首頁 | `/` | 提供註冊和登入的導航按鈕 |
-| 註冊頁 | `/register.html` | 新用戶註冊表單 |
-| 登入頁 | `/login.html` | 現有用戶登入表單 |
-| 主頁 | `/dashboard.html` | 登入成功後的用戶主頁 |
+### 1. 環境準備
+- 安裝 [Node.js](https://nodejs.org/) (建議 v14+)
+- 準備一個 [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) 帳號或本地 MongoDB 實例。
 
-## API 端點
+### 2. 安裝與配置
+```bash
+# 安裝依賴套件
+npm install
+```
 
-| 方法 | 路徑 | 說明 |
-|------|------|------|
-| `POST` | `/register` | 用戶註冊 |
-| `POST` | `/login` | 用戶登入 |
-| `GET` | `/logout` | 用戶登出 |
+**配置資料庫：**
+編輯 `server.js`，將 `MONGODB_URI` 替換為您的 MongoDB 連接字串：
+```javascript
+const MONGODB_URI = 'mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/...';
+```
 
-### 註冊端點 (`POST /register`)
-- 請求參數：`username`, `password`
-- 成功：重定向到登入頁面
-- 失敗：返回錯誤訊息
+### 3. 啟動專案
+```bash
+# 啟動伺服器
+npm start
+```
+啟動後，請訪問：`http://localhost:3000`
 
-### 登入端點 (`POST /login`)
-- 請求參數：`username`, `password`
-- 成功：重定向到主頁 (附帶用戶名參數)
-- 失敗：返回錯誤訊息
+## API 概覽
 
-## 安全說明
-
-- 密碼使用 bcrypt 進行哈希處理，不會以明文存儲
-- 建議在生產環境中使用 HTTPS
-- 建議使用環境變量管理敏感信息 (如 MongoDB 連接字串)
-- 目前的會話管理為簡化版本，生產環境建議使用 session 或 JWT
-
-## 授權
-
-ISC License
+| 路徑 | 方法 | 說明 | 權限 |
+| :--- | :--- | :--- | :--- |
+| `/register` | `POST` | 註冊新用戶 | 公開 |
+| `/login` | `POST` | 登入並創建 Session | 公開 |
+| `/logout` | `GET` | 銷毀 Session 並登出 | 需登入 |
+| `/api/user` | `GET` | 獲取當前用戶資訊 | 需登入 |
+| `/dashboard` | `GET` | 訪問受保護的主頁 | 需登入 |
